@@ -88,7 +88,38 @@ FROM ( SELECT
 WHERE strtomember("[star_members].[TallyYear].&[" + [measures].[pylagged] +"]")
       
       
-      
+with
+member [measures].[LaggedStart] as format(dateadd("m", -3,Now()), "yyyy") + "01"
+member [measures].[LaggedEnd] as format(dateadd("m", -3, Now()), "yyyyMM")
+
+SELECT  
+	{	[measures].[mms] 
+		, [Measures].[FollowUp7_Rate] 
+		, [Measures].[visit_mbr_pcp_ratio] 
+		, [Measures].[readmit_Rate_AAD] 
+	}
+ON COLUMNS,
+
+	filter(
+		{ ([regions].[region_text].[region_text].allmembers
+			* [pcp].[pcpname].[pcpname].allmembers
+			* [dates].[FirstDayOfMonth].[FirstDayOfMonth].allmembers
+			* [dates].[MonthNameShort].[MonthNameShort].allmembers
+			* [pcp].[pcpno].[pcpno].allmembers ) 
+		}
+		, [measures].[mms] > 0
+	)
+ON ROWS
+	FROM	(	SELECT ( STRTOSET(@pcppcpname, constrained) )
+	ON COLUMNS
+		FROM   (
+		SELECT ( STRTOSET(@regionsregiontext, constrained) )
+		ON COLUMNS
+
+FROM   [MultiSourced]
+	))
+where strtomember("[dates].[yyyymm].[" + [measures].[laggedstart] +"]") : strtomember("[dates].[yyyymm].[" + [measures].[laggedend] +"]")
+        
       
  
 
