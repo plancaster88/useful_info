@@ -1,0 +1,17 @@
+--Lookup a value
+=lookup(Fields!region.Value &  Fields!TallyMonth.Value, Fields!region.Value  & Fields!TallyMonth.Value
+, Fields!RevenuePhysMedPMPM.Value, "MonthlyCYLagged")
+
+
+--Lookup in an array
+=LookupSet(Fields!region.Value, Fields!region.Value, Fields!mms.Value, "TopVarProv")(0)
+
+--Use IsNothing  to check for null
+=iif
+(	IsNothing(lookupset(Fields!region.Value,Fields!region.Value, Fields!er_visits_sum.Value, "TopERMembers")(0))
+	, ""
+	, lookupset(Fields!region.Value,Fields!region.Value, Fields!member_no.Value, "TopERMembers")(0)
+)
+
+--Change report item color
+=iif(Reportitems!goal1.Value > Reportitems!score1.Value, "LightCoral", "LightGreen")
