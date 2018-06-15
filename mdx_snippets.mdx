@@ -1,0 +1,97 @@
+with	
+	member [measures].[PYLaggedStart] as format(dateadd("m", -3,Now()), "yyyy") + "01"
+	member [measures].[PYLaggedEnd] as format(dateadd("m", -3,Now()), "yyyy") + "12"
+	member [measures].[MaxLaggedTallyMonth] as month(dateadd("m", -3, Now()))
+	member [measures].[Lag3m] as format(dateadd("m", -3,Now()), "MMM") + " '" + format(dateadd("m", -3,Now()), "yy")
+	member [measures].[Lag4m] as format(dateadd("m", -4,Now()), "MMM") + " '" + format(dateadd("m", -4,Now()), "yy")
+	member [measures].[Lag6m] as format(dateadd("m", -6,Now()), "MMM") + " '" + format(dateadd("m", -6,Now()), "yy") // for top admits & er visits
+member [measures].[rundate] as format(now(), "MM/dd/yyy")
+
+select 
+non empty
+{[Measures].[MaxLaggedTallyMonth], [measures].[Lag3m], [measures].[Lag4m], [measures].[Lag6m],  [measures].[rundate]
+} on columns,
+non empty
+filter({[members].[region].children}, [members].[region].currentmember.name <> '' and 
+[measures].[mms] > 0)*
+{[members].[region_text].children}*
+{[members].[pcpname].children}*
+{[dates].[tallymonth].children}*
+{[dates].[firstdayofmonth].children}
+on rows
+FROM [MultiSourced]
+where	strtomember("[dates].[yyyymm].[" + [measures].[pylaggedend] +"]") : 
+		strtomember("[dates].[yyyymm].[" + [measures].[pylaggedstart] +"]")
+    
+    
+ with	
+	member [measures].[PYLaggedStart] as format(dateadd("m", -3,Now()), "yyyy") + "01"
+	member [measures].[PYLaggedEnd] as format(dateadd("m", -3,Now()), "yyyyMM")
+
+
+select 
+non empty
+{
+	[Measures].[adj_pooltarget_MixAdjusted]
+	, [Measures].[Total_phn_phys_cost_pmpm]
+	, [Measures].[PhysPhnVarAdjTargetCost_pmpm]
+} on columns,
+non empty
+Generate(
+	{[regions].[region].children}
+	, {([regions].[region].CurrentMember)} *
+	bottomCount(
+		-{[PhysSpecBudgets].[specpool].&}
+		, 5
+		, ([Measures].[PhysPhnVarAdjTargetCost_pmpm])
+		) , all
+	) on rows
+from multisourced
+where	strtomember("[dates].[yyyymm].[" + [measures].[pylaggedstart] +"]") : 
+		strtomember("[dates].[yyyymm].[" + [measures].[pylaggedend] +"]")
+    
+
+
+
+with 
+	member [measures].[PYLagged] as format(dateadd("m", -3,Now()), "yyyy")
+
+SELECT 
+  NON EMPTY { 
+    [Measures].[target], 
+    [Measures].[target_pcr], 
+    [Measures].[measure_score_toDate], 
+    [Measures].[pcr_score]
+  } ON COLUMNS, 
+  NON EMPTY { 
+    ( 
+      [star_members].[region].[region].allmembers * 
+      [targets].[Measure_Desc].[Measure_Desc].allmembers 
+    ) 
+  } ON ROWS 
+FROM ( SELECT 
+       ( 
+         { 
+           [targets].[Measure_Desc].&[Adherence to Oral Diabetic Med], 
+           [targets].[Measure_Desc].&[Adherence to RAS Antagonist Med], 
+           [targets].[Measure_Desc].&[Adherence to Statins Med], 
+           [targets].[Measure_Desc].&[Blood Pressure Controlled], 
+           [targets].[Measure_Desc].&[Breast Cancer Screening], 
+           [targets].[Measure_Desc].&[Colon Cancer Screening], 
+           [targets].[Measure_Desc].&[Plan All Cause Readmissions], 
+           [targets].[Measure_Desc].&[NEW-Med Reconciliation Post-Discharge], 
+           [targets].[Measure_Desc].&[Diabetes Care - A1c Controlled] 
+         } 
+       ) ON COLUMNS 
+     FROM [MultiSourced]
+	 )
+WHERE strtomember("[star_members].[TallyYear].&[" + [measures].[pylagged] +"]")
+      
+      
+      
+      
+ 
+
+
+
+
