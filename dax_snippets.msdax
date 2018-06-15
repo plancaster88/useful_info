@@ -1,0 +1,93 @@
+//ALL Date Slicer Aware
+CALCULATE([Member Months], ALLEXCEPT(mmonths,Dates[tallydate]))
+
+//Prior Year Calculations 
+calculate([Member Months], dateadd(Dates[TallyDate],-1,year)) 
+
+//Target per 1k from related table
+sumx('Mmonths',related(plans[TargetAcute]))/[Member Months]))
+
+//Get value from last date in a table
+calculate(sumx(mmonths,related(Plans[BidRisk]))/[Member Months],lastdate(Mmonths[key_eff_date]))
+
+//Blank any level in a pivot table at or under a specified column level
+if(ISFILTERED(FFSE[ServName]),blank(),[Total Pay]/[Allowed])
+
+//Many to Many Table w/o Bridge
+Target:=
+SUMX (
+    Denom, (
+        CALCULATE (
+            SUM ( SpecpoolBudget[budget] ),
+            FILTER ( SpecpoolBudget, mmonths[carrier] = SpecpoolBudget[carrier] )
+        )
+    )
+)
+--Average weighted target amount of all members selected 
+
+//UM Peer % w/ cross enrolled membership for a time period
+CALCULATE([UMs],EXCEPT(all(MktRegPCP),allselected(MktRegPCP))) 
+
+
+
+//DAX Table Query Examples
+
+evaluate --needed 
+
+var test = 1 return //user defined variable
+
+CALCULATETABLE( //Like a WHERE in SQL
+	filter(  //Like a HAVING in SQL
+		summarizecolumns(
+			//'dates'[yyyymm]
+			//'star_members'[TallyYear] 
+			 'regions'[region]
+			, 'pcp'[pcpname]
+			, "test", test //use of a variable
+			, "MMs", [MMs] //Name measure columns
+			, "star score met 4", [star_score_met4]
+			, "star score under 4", [star_score_under4]
+			, "Panel", [CurrentMembersMax]
+		)
+		, [MMs] <> 0 
+	)
+	, 'dates'[yyyymm] >= "201801"
+	, regions[region] = "HI"
+	, 'star_members'[TallyYear] = 2018
+)
+////////////////////////////////////////////////////////////////////////////////////////////
+evaluate
+
+var lagEnd = 
+	format(
+		if( month(today()) > 3, date(year(today()), month(today()) - 3, 1)
+			, date(year(today()-1), 9 + month(today()), 1 )
+		) , "yyyyMM" 
+	)  
+var lagStart = 
+	format(	
+		if( month(today()) > 3, date(year(today()), 1, 1)
+			, date(year(today()-1), 1, 1 )
+		) , "yyyyMM" 
+	) 
+
+var lagEndPY = CONCATENATE( (left(lagEnd, 4) -1), right(lagEnd, 2) ) 
+var lagStartPY = CONCATENATE( (left(lagEnd, 4) -1), "01" ) 
+return
+
+SUMMARIZECOLUMNS(
+	'members'[region]
+	//, filter('dates', dates[TallyDate] >= DATEVALUE("2017-01-01") && dates[TallyDate] <= DATEVALUE("2017-09-01"))
+	, filter('members', 'members'[region] <> "")
+	, "MMs" , [mms]
+	, "MMsVar"
+		,	VAR MMsVar = CALCULATE([mms], filter('dates', dates[yyyymm] >= lagStart
+			&& dates[yyyymm] <= lagEnd)) RETURN	
+			MMsVar
+	, "PYMMsVar"
+		,	VAR PY_MMsVar = CALCULATE([mms], filter('dates', dates[TallyDate] >= DATEVALUE("2016-01-01") 
+			&& dates[TallyDate] <= DATEVALUE("2016-09-01"))) RETURN	
+			PY_MMsVar
+	, "lagStartPY", lagStartPY
+	, "lagEndPY", lagEndPY
+) order by [MMsVar] desc
