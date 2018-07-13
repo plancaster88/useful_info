@@ -1,0 +1,5 @@
+
+
+
+Link to comprehensive Format Cells guide. (not to be confused w/ conditional formatting)
+  https://www.ablebits.com/office-addins-blog/2016/07/07/custom-excel-number-format/
