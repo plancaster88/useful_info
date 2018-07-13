@@ -3,3 +3,10 @@
 
 Link to comprehensive Format Cells guide. (not to be confused w/ conditional formatting)
   https://www.ablebits.com/office-addins-blog/2016/07/07/custom-excel-number-format/
+  
+  
+  
+  
+
+Auto refresh an excel workbooks data connections automatically with VBA (see answer from jpuck1054700)
+    https://stackoverflow.com/questions/16222091/refresh-both-the-external-data-source-and-pivot-tables-together-within-a-time-sc
