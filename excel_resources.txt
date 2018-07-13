@@ -8,5 +8,5 @@ Link to comprehensive Format Cells guide. (not to be confused w/ conditional for
   
   
 
-Auto refresh an excel workbooks data connections automatically with VBA (see answer from jpuck1054700)
+Auto refresh an excel workbooks data connections automatically with VBA (see answer from FABZ)
     https://stackoverflow.com/questions/16222091/refresh-both-the-external-data-source-and-pivot-tables-together-within-a-time-sc
