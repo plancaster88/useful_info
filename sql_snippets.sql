@@ -123,3 +123,38 @@ SELECT *
 FROM #tempsize
   
   
+  
+  
+  
+  
+/*************** DB Table Sizes ********************/
+ select 
+	schemaname = s.name
+	, tablename = t.name
+	, hasindexnamed = i.name
+	, createddate = t.create_date
+	, modifieddate = t.modify_date
+	, rowcounts = sum(p.rows)
+	, totalpages = sum(a.total_pages) 
+	, usedpages = sum(a.used_pages)
+	, datapages = sum(a.data_pages)
+	, totalspacemb = (sum(a.total_pages) * 8) / 1024 
+	, usedspacemb = (sum(a.used_pages) * 8) / 1024
+	, dataspacemb = (sum(a.data_pages) * 8) / 1024
+from sys.tables t 
+	join sys.schemas s on t.schema_id = s.schema_id 
+	join sys.indexes i on t.object_id = i.object_id
+	join sys.partitions p on i.object_id = p.object_id and i.index_id = p.index_id
+	join sys.allocation_units a on p.partition_id = a.container_id
+where 
+	t.name not like 'dt%'	-- dtproperties, design junk used by redgate, visualstudio, and others.
+	and i.index_id <= 1	-- cix's only
+group by s.name
+	, t.name
+	, i.object_id
+	, i.index_id
+	, i.name
+	, t.create_date
+	, t.modify_date 
+order by ((sum(a.total_pages) * 8) / 1024) desc, t.name
+  
