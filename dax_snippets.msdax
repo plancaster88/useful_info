@@ -91,3 +91,11 @@ SUMMARIZECOLUMNS(
 	, "lagStartPY", lagStartPY
 	, "lagEndPY", lagEndPY
 ) order by [MMsVar] desc
+
+//Proper use of filtering in a measure
+AcuteAdmits_ClaimOrCensus:=
+	CALCULATE([AcuteAdmitCT], filter('AcuteAdmit', 'AcuteAdmit'[AdmitClass] = "AI")
+		, filter('dates', 'dates'[CensusAdmits] = "Claims")) 
+	+ CALCULATE([CensusAcuteAdmit], filter('dates', 'dates'[CensusAdmits] = "Census"))
+
+
