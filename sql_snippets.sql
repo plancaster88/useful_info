@@ -185,14 +185,17 @@ order by ((sum(a.total_pages) * 8) / 1024) desc, t.name
 						
 						
 /*************** Date Table ********************/						
-with cte_dates ([Date]) as (
-    Select [Date] = convert(datetime,'2010-01-01') -- Put the start date here
+declare @sd datetime = '2010-01-01' --Start date here
+declare @ed datetime = '2015-12-31' --End date here 
+
+;with cte_dates ([Date]) as (
+    select [Date] = convert(datetime, @sd) 
 
     union all 
 
-    Select dateadd(day, 1, [Date])
+    select dateadd(day, 1, [Date])
     from cte_dates
-    where [Date] <= '2020-12-31' -- Put the end date here 
+    where [Date] < @ed
 )
 
 select 
@@ -208,6 +211,7 @@ select
 	, DayOfWeek = datepart(dw, [date])	
 	, DayOfMonth = Day([date])
 	, DayName = datename(w, [date])
+	, DayNameShort = LEFT(datename(w, [date]),2)
 	, Week = datepart(wk, [date])
 	, StartOfMonth = DATEADD(mm, DATEDIFF(mm,0,[date]), 0)
 	, EndOfMonth = cast(eomonth([date]) as datetime)
@@ -219,6 +223,10 @@ select
 from cte_dates
 
 option (maxrecursion 32767) -- Don't forget to use the maxrecursion option!
+
+
+
+
 						
 						
 						
