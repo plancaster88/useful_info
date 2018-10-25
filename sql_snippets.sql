@@ -150,10 +150,6 @@ SELECT *
 FROM #tempsize
   
   
-  
-  
-  
-  
 /*************** DB Table Sizes ********************/
  select 
 	schemaname = s.name
@@ -185,3 +181,44 @@ group by s.name
 	, t.modify_date 
 order by ((sum(a.total_pages) * 8) / 1024) desc, t.name
   
+
+						
+						
+/*************** Date Table ********************/						
+with cte_dates ([Date]) as (
+    Select [Date] = convert(datetime,'2010-01-01') -- Put the start date here
+
+    union all 
+
+    Select dateadd(day, 1, [Date])
+    from cte_dates
+    where [Date] <= '2020-12-31' -- Put the end date here 
+)
+
+select 
+	[Date]
+	, Year = Year([date]) 
+	, Month = Month([date])
+	, MonthName = datename(mm, [date])
+	, MonthNameShort = left(datename(mm, [date]),3)
+	, Quarter = datename(qq, [date]) 
+	, QuarterName = case	when datename(qq, [date]) = 1 then 'First' when datename(qq, [date]) = 2 then 'Second' 
+							when datename(qq, [date]) = 3 then 'Third' when datename(qq, [date]) = 4 then 'Fourth' end
+	, Day = datepart(dy, [date]) 
+	, DayOfWeek = datepart(dw, [date])	
+	, DayOfMonth = Day([date])
+	, DayName = datename(w, [date])
+	, Week = datepart(wk, [date])
+	, StartOfMonth = DATEADD(mm, DATEDIFF(mm,0,[date]), 0)
+	, EndOfMonth = cast(eomonth([date]) as datetime)
+	, IsCurrentYear = case when year([date]) = year([date]) then 1 else 0 end 
+	, IsCurrentMonth = case when year([date]) = year([date]) and month([date]) = month([date]) then 1 else 0 end 
+	, IsCurrentDate = case when [date] = getdate() then 1 else 0 end 
+	, IsLeapYear = CASE WHEN (year([date]) % 4 = 0 AND year([date]) % 100 <> 0) OR year([date]) % 400 = 0 THEN 1 else 0 end 
+	, YYYYMM = format([date], 'yyyy-MM') --convert(varchar(6), date, 112)
+from cte_dates
+
+option (maxrecursion 32767) -- Don't forget to use the maxrecursion option!
+						
+						
+						
