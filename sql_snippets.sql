@@ -225,8 +225,8 @@ from cte_dates
 option (maxrecursion 32767) -- Don't forget to use the maxrecursion option!
 
 
-
-
+/*************** Section Header ********************/	
+select Header = '/*' + replicate('-',78) union all select '' union all select replicate('-',78) + '*/' 
 						
 						
 						
