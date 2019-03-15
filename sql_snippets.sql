@@ -238,11 +238,11 @@ from #UnPivot
 cross apply
 (
   values
-      (Diagnosis1, 1)
+          (Diagnosis1, 1)
 	, (Diagnosis2, 2)
-    , (Diagnosis3, 3)
-    , (Diagnosis4, 4)
-    , (Diagnosis5, 5)
+	, (Diagnosis3, 3)
+	, (Diagnosis4, 4)
+	, (Diagnosis5, 5)
 
 ) c (Diagnosis, DiagnosisSequence)
 where c.Diagnosis is not null
