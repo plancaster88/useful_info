@@ -92,20 +92,6 @@ c.name like '%Fee%'     --Type the column you are searching for here. I use a wi
 	where log_process = 'usp_MySampleProcedure' 
 	order by log_date desc;
 
-  /****************  Splicing a String by a Delimiter *******************/
-	if object_id('tempdb..#ExampleString','u') is not null begin drop table #ExampleString end;
-	create table #ExampleString (
-		MyLongString varchar(150)
-	);
-	insert into #ExampleString (MyLongString) values ('123-1234-12345,ABC,ABCD,ABCDE');
-
-	-- Demonstrates breaking the string up into individual rows, by a delimiter (any char) found within the string.
-	select b.item 
-	from #ExampleString a 
-	cross apply ( select * from decisionsupport.[usr].[DelimitedSplit8K](a.MyLongString,'-') ) b;
-
-	-- Or, used another way..
-	select item from decisionsupport.[usr].[DelimitedSplit8K]((select MyLongString from #ExampleString),',');
   
  /*************** Combine Multiple Rows into Delimited String ROW (AKA Concatenation / GROUP_CONCAT)  ********************/
 	-- From a table of multiple rows of strings, combine those 
