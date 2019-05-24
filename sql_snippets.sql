@@ -249,4 +249,34 @@ where c.Diagnosis is not null
 
 				 
 				 
-						
+
+/*************** Split column to rows on delimiter ********************/					 
+--https://sqlperformance.com/2012/07/t-sql-queries/split-strings
+		
+CREATE FUNCTION dbo.fnSplitToRows
+(
+    @List       varchar(MAX),
+    @Delimiter  varchar(255)
+)
+RETURNS TABLE
+WITH SCHEMABINDING
+AS
+   RETURN 
+   (  
+      SELECT Item = y.i.value('(./text())[1]', 'nvarchar(4000)')
+      FROM 
+      ( 
+        SELECT x = CONVERT(XML, '<i>' 
+          + REPLACE(@List, @Delimiter, '</i><i>') 
+          + '</i>').query('.')
+      ) AS a CROSS APPLY x.nodes('i') AS y(i)
+   );
+GO
+/*HOW TO USE dbo.fnSplitToRows			 
+select 
+	t.Column
+	, ColumnSplittingToRows = f.Item
+from tbl t 
+	CROSS APPLY dbo.fnSplitToRows(t.columntosplit), ',') as f 				 				 
+*/				 
+				 
