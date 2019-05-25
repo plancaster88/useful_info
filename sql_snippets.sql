@@ -252,6 +252,7 @@ where c.Diagnosis is not null
 
 /*************** Split column to rows on delimiter ********************/					 
 --https://sqlperformance.com/2012/07/t-sql-queries/split-strings
+--Other uses of CROSS/OUTER APPLY https://stackoverflow.com/questions/9275132/real-life-example-when-to-use-outer-cross-apply-in-sql
 		
 CREATE FUNCTION dbo.fnSplitToRows
 (
